@@ -30,7 +30,7 @@ public class UserController : ControllerBase
             , [Email]
             , [Gender]
             , [Active]
-            FROM  TutorialAppSchema.Users";
+            FROM  AppSchema.Users";
 
         IEnumerable<User> users = _dapper.LoadData<User>(sql);
         return users;
@@ -46,9 +46,76 @@ public class UserController : ControllerBase
                 [Email],
                 [Gender],
                 [Active] 
-            FROM TutorialAppSchema.Users
+            FROM AppSchema.Users
                 WHERE UserId = " + userId.ToString(); //"7"
         User user = _dapper.LoadDataSingle<User>(sql);
         return user;
+    }
+
+    [HttpPut("EditUser")]
+    public IActionResult EditUser(User user)
+    {
+        string sql = @"
+        UPDATE AppSchema.Users
+            SET [FirstName] = '" + user.FirstName + 
+                "', [LastName] = '" + user.LastName +
+                "', [Email] = '" + user.Email + 
+                "', [Gender] = '" + user.Gender + 
+                "', [Active] = '" + user.Active + 
+            "' WHERE UserId = " + user.UserId;
+        
+        Console.WriteLine(sql);
+
+        if (_dapper.ExecuteSql(sql))
+        {
+            return Ok();
+        } 
+
+        throw new Exception("Failed to Update User");
+    }
+
+
+    [HttpPost("AddUser")]
+    public IActionResult AddUser(UserToAddDto user)
+    {
+        string sql = @"INSERT INTO AppSchema.Users(
+                [FirstName],
+                [LastName],
+                [Email],
+                [Gender],
+                [Active]
+            ) VALUES (" +
+                "'" + user.FirstName + 
+                "', '" + user.LastName +
+                "', '" + user.Email + 
+                "', '" + user.Gender + 
+                "', '" + user.Active + 
+            "')";
+        
+        Console.WriteLine(sql);
+
+        if (_dapper.ExecuteSql(sql))
+        {
+            return Ok();
+        } 
+
+        throw new Exception("Failed to Add User");
+    }
+
+    [HttpDelete("DeleteUser/{userId}")]
+    public IActionResult DeleteUser(int userId)
+    {
+        string sql = @"
+            DELETE FROM AppSchema.Users 
+                WHERE UserId = " + userId.ToString();
+        
+        Console.WriteLine(sql);
+
+        if (_dapper.ExecuteSql(sql))
+        {
+            return Ok();
+        } 
+
+        throw new Exception("Failed to Delete User");
     }
 }
