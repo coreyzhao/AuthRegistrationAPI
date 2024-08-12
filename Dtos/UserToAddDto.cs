@@ -1,4 +1,4 @@
-namespace AuthRegistrationAPI
+namespace AuthRegistrationAPI.Dtos
 {
     public partial class UserToAddDto
     {

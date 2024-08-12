@@ -1,4 +1,4 @@
-namespace AuthRegistrationAPI
+namespace AuthRegistrationAPI.Models
 {
     public partial class User
     {
