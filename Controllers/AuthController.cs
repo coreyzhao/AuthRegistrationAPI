@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using AuthRegistrationAPI.Data;
 using AuthRegistrationAPI.Dtos;
+using AuthRegistrationAPI.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Mvc;
@@ -19,12 +20,12 @@ namespace AuthRegistrationAPI.Controllers
     public class AuthController : ControllerBase
     {
         private readonly DataContextDapper _dapper;
-        private readonly IConfiguration _config;
+        private readonly AuthHelper _authHelper;
 
         public AuthController(IConfiguration config)
         {
             _dapper = new DataContextDapper(config);
-            _config = config;
+            _authHelper = new AuthHelper(config);
         }
 
         [AllowAnonymous]
@@ -45,7 +46,7 @@ namespace AuthRegistrationAPI.Controllers
                         rng.GetNonZeroBytes(passwordSalt);
                     }
 
-                    byte[] passwordHash = GetPasswordHash(userForRegistration.Password, passwordSalt);
+                    byte[] passwordHash = _authHelper.GetPasswordHash(userForRegistration.Password, passwordSalt);
 
                     string sqlAddAuth = @"
                         INSERT INTO AppSchema.Auth  ([Email],
@@ -66,7 +67,7 @@ namespace AuthRegistrationAPI.Controllers
 
                     if (_dapper.ExecuteSqlWithParameters(sqlAddAuth, sqlParameters))
                     {
-
+                        
                         string sqlAddUser = @"
                             INSERT INTO AppSchema.Users(
                                 [FirstName],
@@ -75,10 +76,10 @@ namespace AuthRegistrationAPI.Controllers
                                 [Gender],
                                 [Active]
                             ) VALUES (" +
-                                "'" + userForRegistration.FirstName +
+                                "'" + userForRegistration.FirstName + 
                                 "', '" + userForRegistration.LastName +
-                                "', '" + userForRegistration.Email +
-                                "', '" + userForRegistration.Gender +
+                                "', '" + userForRegistration.Email + 
+                                "', '" + userForRegistration.Gender + 
                                 "', 1)";
                         if (_dapper.ExecuteSql(sqlAddUser))
                         {
@@ -105,14 +106,13 @@ namespace AuthRegistrationAPI.Controllers
             UserForLoginConfirmationDto userForConfirmation = _dapper
                 .LoadDataSingle<UserForLoginConfirmationDto>(sqlForHashAndSalt);
 
-            byte[] passwordHash = GetPasswordHash(userForLogin.Password, userForConfirmation.PasswordSalt);
+            byte[] passwordHash = _authHelper.GetPasswordHash(userForLogin.Password, userForConfirmation.PasswordSalt);
 
             // if (passwordHash == userForConfirmation.PasswordHash) // Won't work
 
             for (int index = 0; index < passwordHash.Length; index++)
             {
-                if (passwordHash[index] != userForConfirmation.PasswordHash[index])
-                {
+                if (passwordHash[index] != userForConfirmation.PasswordHash[index]){
                     return StatusCode(401, "Incorrect password!");
                 }
             }
@@ -124,7 +124,7 @@ namespace AuthRegistrationAPI.Controllers
             int userId = _dapper.LoadDataSingle<int>(userIdSql);
 
             return Ok(new Dictionary<string, string> {
-                {"token", CreateToken(userId)}
+                {"token", _authHelper.CreateToken(userId)}
             });
         }
 
@@ -134,59 +134,10 @@ namespace AuthRegistrationAPI.Controllers
             string userIdSql = @"
                 SELECT UserId FROM AppSchema.Users WHERE UserId = '" +
                 User.FindFirst("userId")?.Value + "'";
-
+            
             int userId = _dapper.LoadDataSingle<int>(userIdSql);
 
-            return CreateToken(userId);
-        }
-
-        private byte[] GetPasswordHash(string password, byte[] passwordSalt)
-        {
-            string passwordSaltPlusString = _config.GetSection("AppSettings:PasswordKey").Value +
-                Convert.ToBase64String(passwordSalt);
-
-            return KeyDerivation.Pbkdf2(
-                password: password,
-                salt: Encoding.ASCII.GetBytes(passwordSaltPlusString),
-                prf: KeyDerivationPrf.HMACSHA256,
-                iterationCount: 1000000,
-                numBytesRequested: 256 / 8
-            );
-        }
-
-
-        private string CreateToken(int userId)
-        {
-            Claim[] claims = new Claim[] {
-                new Claim("userId", userId.ToString())
-            };
-
-            string? tokenKeyString = _config.GetSection("AppSettings:TokenKey").Value;
-
-            SymmetricSecurityKey tokenKey = new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(
-                        tokenKeyString != null ? tokenKeyString : ""
-                    )
-                );
-
-            SigningCredentials credentials = new SigningCredentials(
-                    tokenKey,
-                    SecurityAlgorithms.HmacSha256Signature
-                );
-
-            SecurityTokenDescriptor descriptor = new SecurityTokenDescriptor()
-            {
-                Subject = new ClaimsIdentity(claims),
-                SigningCredentials = credentials,
-                Expires = DateTime.Now.AddDays(1)
-            };
-
-            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-
-            SecurityToken token = tokenHandler.CreateToken(descriptor);
-
-            return tokenHandler.WriteToken(token);
-
+            return _authHelper.CreateToken(userId);
         }
 
     }
