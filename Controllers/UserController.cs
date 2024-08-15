@@ -67,7 +67,6 @@ public class UserController : ControllerBase
                 "', [Active] = '" + user.Active + 
             "' WHERE UserId = " + user.UserId;
         
-        Console.WriteLine(sql);
 
         if (_dapper.ExecuteSql(sql))
         {
@@ -95,8 +94,7 @@ public class UserController : ControllerBase
                 "', '" + user.Gender + 
                 "', '" + user.Active + 
             "')";
-        
-        Console.WriteLine(sql);
+
 
         if (_dapper.ExecuteSql(sql))
         {
@@ -112,8 +110,7 @@ public class UserController : ControllerBase
         string sql = @"
             DELETE FROM AppSchema.Users 
                 WHERE UserId = " + userId.ToString();
-        
-        Console.WriteLine(sql);
+
 
         if (_dapper.ExecuteSql(sql))
         {
