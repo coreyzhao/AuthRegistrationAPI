@@ -15,11 +15,24 @@ public class UserController : ControllerBase
     {
         _dapper = new DataContextDapper(config);
     }
+   
+
     
-    [HttpGet("TestConnection")]
-    public DateTime TestConnection()
+    [HttpGet("GetSingleUser/{userId}")]
+    // public IEnumerable<User> GetUsers()
+    public User GetSingleUser(int userId)
     {
-        return _dapper.LoadDataSingle<DateTime>("SELECT GETDATE()");
+        string sql = @"
+            SELECT [UserId],
+                [FirstName],
+                [LastName],
+                [Email],
+                [Gender],
+                [Active] 
+            FROM AppSchema.Users
+                WHERE UserId = " + userId.ToString(); //"7"
+        User user = _dapper.LoadDataSingle<User>(sql);
+        return user;
     }
 
     [HttpGet("GetUsers")]
@@ -38,23 +51,9 @@ public class UserController : ControllerBase
         return users;
     }
 
-    [HttpGet("GetSingleUser/{userId}")]
-    // public IEnumerable<User> GetUsers()
-    public User GetSingleUser(int userId)
-    {
-        string sql = @"
-            SELECT [UserId],
-                [FirstName],
-                [LastName],
-                [Email],
-                [Gender],
-                [Active] 
-            FROM AppSchema.Users
-                WHERE UserId = " + userId.ToString(); //"7"
-        User user = _dapper.LoadDataSingle<User>(sql);
-        return user;
-    }
     
+
+
     [HttpPut("EditUser")]
     public IActionResult EditUser(User user)
     {
