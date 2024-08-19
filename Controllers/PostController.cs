@@ -110,7 +110,7 @@ namespace AuthRegistrationAPI.Controllers
                 return Ok();
             }
 
-            throw new Exception("Failed to create new post!");
+            throw new Exception("Error: Unable to create new post");
         }
 
         // [AllowAnonymous]
@@ -130,7 +130,7 @@ namespace AuthRegistrationAPI.Controllers
                 return Ok();
             }
 
-            throw new Exception("Failed to edit post!");
+            throw new Exception("Error: Failed to edit post");
         }
 
         [HttpDelete("Post/{postId}")]
@@ -146,7 +146,7 @@ namespace AuthRegistrationAPI.Controllers
                 return Ok();
             }
 
-            throw new Exception("Failed to delete post!");
+            throw new Exception("Error: Failed to delete post");
         }
     }
 }

@@ -72,7 +72,7 @@ public class UserController : ControllerBase
             return Ok();
         } 
 
-        throw new Exception("Failed to Update User");
+        throw new Exception("Error: Unable to Update User");
     }
 
 
@@ -100,7 +100,7 @@ public class UserController : ControllerBase
             return Ok();
         } 
 
-        throw new Exception("Failed to Add User");
+        throw new Exception("Error: Unable to Add User");
     }
 
     [HttpDelete("DeleteUser/{userId}")]
@@ -116,7 +116,7 @@ public class UserController : ControllerBase
             return Ok();
         } 
 
-        throw new Exception("Failed to Delete User");
+        throw new Exception("Error: Unable to Delete User");
     }
 
 

@@ -85,13 +85,13 @@ namespace AuthRegistrationAPI.Controllers
                         {
                             return Ok();
                         }
-                        throw new Exception("Failed to add user.");
+                        throw new Exception("Error: Unable to add the user.");
                     }
-                    throw new Exception("Failed to register user.");
+                    throw new Exception("Error: Unable to authenticate the user.");
                 }
-                throw new Exception("User with this email already exists!");
+                throw new Exception("Error: User with this email already exists");
             }
-            throw new Exception("Passwords do not match!");
+            throw new Exception("Error: Passwords do not match");
         }
 
         [AllowAnonymous]
@@ -113,7 +113,7 @@ namespace AuthRegistrationAPI.Controllers
             for (int index = 0; index < passwordHash.Length; index++)
             {
                 if (passwordHash[index] != userForConfirmation.PasswordHash[index]){
-                    return StatusCode(401, "Incorrect password!");
+                    return StatusCode(401, "Incorrect password");
                 }
             }
 
