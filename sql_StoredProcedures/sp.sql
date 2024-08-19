@@ -1,28 +1,6 @@
 USE AppDatabase;
 GO
 
-CREATE OR ALTER PROCEDURE AppSchema.spUsers_Get
-/*EXEC AppSchema.spUsers_Get @UserId=3*/
-    @UserId INT = NULL
-AS
-BEGIN
-    SELECT [Users].[UserId],
-        [Users].[FirstName],
-        [Users].[LastName],
-        [Users].[Email],
-        [Users].[Gender],
-        [Users].[Active],
-        UserSalary.Salary,
-        UserJobInfo.Department,
-        UserJobInfo.JobTitle
-    FROM AppSchema.Users AS Users 
-        LEFT JOIN AppSchema.UserSalary AS UserSalary
-            ON UserSalary.UserId = Users.UserId
-        LEFT JOIN AppSchema.UserJobInfo AS UserJobInfo
-            ON UserJobInfo.UserId = Users.UserId
-        WHERE Users.UserId = ISNULL(@UserId, Users.UserId)
-END;
-GO
 
 CREATE OR ALTER PROCEDURE AppSchema.spUsers_Get
 /*EXEC AppSchema.spUsers_Get @UserId=3*/
