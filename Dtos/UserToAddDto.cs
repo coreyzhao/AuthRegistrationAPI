@@ -7,7 +7,6 @@ namespace AuthRegistrationAPI.Dtos
         public string Email {get; set;}
         public string Gender {get; set;}
         public bool Active {get; set;}
-
         public UserToAddDto()
         {
             if (FirstName == null)
