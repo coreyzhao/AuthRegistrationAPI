@@ -22,13 +22,7 @@ public class UserController : ControllerBase
     // public IEnumerable<User> GetUsers()
     public User GetSingleUser(int userId)
     {
-        string sql = @"
-            SELECT [UserId],
-                [FirstName],
-                [LastName],
-                [Email],
-                [Gender],
-                [Active] 
+        string sql = @"SELECT [UserId],[FirstName],[LastName],[Email],[Gender],[Active] 
             FROM AppSchema.Users
                 WHERE UserId = " + userId.ToString(); //"7"
         User user = _dapper.LoadDataSingle<User>(sql);
@@ -39,13 +33,7 @@ public class UserController : ControllerBase
     // public IEnumerable<User> GetUsers()
     public IEnumerable<User> GetUsers()
     {
-        string sql = @"
-            SELECT [UserId],
-                [FirstName],
-                [LastName],
-                [Email],
-                [Gender],
-                [Active] 
+        string sql = @"SELECT [UserId],[FirstName],[LastName],[Email],[Gender],[Active] 
             FROM AppSchema.Users";
         IEnumerable<User> users = _dapper.LoadData<User>(sql);
         return users;
@@ -57,8 +45,7 @@ public class UserController : ControllerBase
     [HttpPut("EditUser")]
     public IActionResult EditUser(User user)
     {
-        string sql = @"
-        UPDATE AppSchema.Users
+        string sql = @"UPDATE AppSchema.Users
             SET [FirstName] = '" + user.FirstName + 
                 "', [LastName] = '" + user.LastName +
                 "', [Email] = '" + user.Email + 
@@ -79,13 +66,7 @@ public class UserController : ControllerBase
     [HttpPost("AddUser")]
     public IActionResult AddUser(UserToAddDto user)
     {
-        string sql = @"
-            INSERT INTO AppSchema.Users(
-                [FirstName],
-                [LastName],
-                [Email],
-                [Gender],
-                [Active]
+        string sql = @"INSERT INTO AppSchema.Users([FirstName],[LastName],[Email],[Gender],[Active]
             ) VALUES (" +
                 "'" + user.FirstName + 
                 "', '" + user.LastName +
@@ -106,8 +87,7 @@ public class UserController : ControllerBase
     [HttpDelete("DeleteUser/{userId}")]
     public IActionResult DeleteUser(int userId)
     {
-        string sql = @"
-            DELETE FROM AppSchema.Users 
+        string sql = @"DELETE FROM AppSchema.Users 
                 WHERE UserId = " + userId.ToString();
 
 
